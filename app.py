@@ -9,6 +9,42 @@ st.set_page_config(
     layout="centered"
 )
 
+# Menyisipkan Custom CSS untuk warna tema Hijau & Oranye
+st.markdown("""
+<style>
+/* Mengubah warna judul utama menjadi Hijau */
+h1 {
+    color: #2E7D32;
+}
+
+/* Mengubah warna tombol 'Siapkan Unduhan' menjadi Oranye */
+div.stButton > button:first-child {
+    background-color: #F26522; 
+    color: white;
+    border-radius: 8px;
+    border: none;
+    font-weight: bold;
+}
+div.stButton > button:first-child:hover {
+    background-color: #D9541A;
+    color: white;
+}
+
+/* Mengubah warna tombol 'Download Video Sekarang' menjadi Hijau */
+div.stDownloadButton > button:first-child {
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 8px;
+    border: none;
+    font-weight: bold;
+}
+div.stDownloadButton > button:first-child:hover {
+    background-color: #45a049;
+    color: white;
+}
+</style>
+""", unsafe_allow_html=True)
+
 # Desain UI (Antarmuka Pengguna)
 st.title("📥 Alat Unduh Drama China")
 st.markdown("Masukkan link video dari channel resmi (seperti YouTube YOUKU, Tencent, iQIYI, dll).")
@@ -20,13 +56,20 @@ url = st.text_input("Link Video URL:", placeholder="https://www.youtube.com/watc
 if st.button("Siapkan Unduhan", use_container_width=True):
     if url:
         with st.spinner("⏳ Sedang memproses dan mengunduh ke server... Mohon tunggu sesaat."):
-            # Konfigurasi yt-dlp
-            # Dibatasi ke 720p agar tidak membebani RAM server gratisan (Hugging Face / Streamlit Cloud)
+            # Konfigurasi yt-dlp dengan trik anti Error 403
             ydl_opts = {
                 'format': 'bestvideo[height<=720][ext=mp4]+bestaudio[ext=m4a]/best[height<=720][ext=mp4]/best',
                 'outtmpl': 'video_unduhan.%(ext)s',
                 'quiet': True,
                 'no_warnings': True,
+                
+                # Trik penyamaran 1: Memaksa yt-dlp menggunakan jalur API Android
+                'extractor_args': {'youtube': ['player_client=android']},
+                
+                # Trik penyamaran 2: Meniru browser asli
+                'http_headers': {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+                }
             }
             
             try:
