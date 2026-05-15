@@ -56,19 +56,23 @@ url = st.text_input("Link Video URL:", placeholder="https://www.youtube.com/watc
 if st.button("Siapkan Unduhan", use_container_width=True):
     if url:
         with st.spinner("⏳ Sedang memproses dan mengunduh ke server... Mohon tunggu sesaat."):
-            # Konfigurasi yt-dlp dengan trik anti Error 403
+            
+            # Konfigurasi yt-dlp dengan trik anti Error 403 tingkat tinggi
             ydl_opts = {
                 'format': 'bestvideo[height<=720][ext=mp4]+bestaudio[ext=m4a]/best[height<=720][ext=mp4]/best',
                 'outtmpl': 'video_unduhan.%(ext)s',
                 'quiet': True,
                 'no_warnings': True,
+                'nocheckcertificate': True, # Mengabaikan sertifikat keamanan yang kadang bentrok
+                'geo_bypass': True, # Melewati blokir wilayah
                 
-                # Trik penyamaran 1: Memaksa yt-dlp menggunakan jalur API Android
-                'extractor_args': {'youtube': ['player_client=android']},
+                # Memaksa yt-dlp mencoba berbagai jalur API ponsel
+                'extractor_args': {'youtube': ['player_client=android,ios,web']},
                 
-                # Trik penyamaran 2: Meniru browser asli
+                # Meniru identitas browser dan bahasa manusia secara lebih detail
                 'http_headers': {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+                    'Accept-Language': 'id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7',
                 }
             }
             
